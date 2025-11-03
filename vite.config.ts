@@ -24,18 +24,49 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-build: {
+  build: {
     rollupOptions: {
       output: {
-        manualChunks(id: string) {
-          if (id.indexOf('node_modules') !== -1) {
-            const basic = id.toString().split('node_modules/')[1];
-            const sub1 = basic.split('/')[0];
-            if (sub1 !== '.pnpm') {
-              return sub1.toString();
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // React core libraries
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
             }
-            const name2 = basic.split('/')[1];
-            return name2.split('@')[name2[0] === '@' ? 1 : 0].toString();
+            // React Router
+            if (id.includes('react-router')) {
+              return 'router-vendor';
+            }
+            // Radix UI components (большая библиотека)
+            if (id.includes('@radix-ui')) {
+              return 'radix-vendor';
+            }
+            // Tanstack Query
+            if (id.includes('@tanstack')) {
+              return 'tanstack-vendor';
+            }
+            // Lucide icons
+            if (id.includes('lucide-react')) {
+              return 'icons-vendor';
+            }
+            // Charts and visualization
+            if (id.includes('recharts') || id.includes('chart')) {
+              return 'charts-vendor';
+            }
+            // Map libraries
+            if (id.includes('leaflet') || id.includes('react-leaflet')) {
+              return 'maps-vendor';
+            }
+            // Form libraries
+            if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod')) {
+              return 'forms-vendor';
+            }
+            // Utility libraries
+            if (id.includes('date-fns') || id.includes('clsx') || id.includes('class-variance-authority')) {
+              return 'utils-vendor';
+            }
+            // Everything else
+            return 'vendor';
           }
         }
       }
